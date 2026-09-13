@@ -9,9 +9,8 @@ def index(request):
         movies = Movie.objects.all()
     template_data = {}
     template_data['title'] = 'Movies'
-    template_data['movies'] = Movie.objects.all()
-    return render(request, 'movies/index.html',
-                  {'template_data': template_data})
+    template_data['movies'] = movies
+    return render(request, 'movies/index.html',  {'template_data': template_data})
 
 def show(request, id):
     movie = Movie.objects.get(id=id)
@@ -65,8 +64,10 @@ def delete_review(request, id, review_id):
 
 @login_required
 def report_review(request, id, review_id):
-    review = get_object_or_404(Review, id=review_id,
-        user=request.user)
-    review.delete()
+    review = get_object_or_404(Review, id=review_id)
     review.flagged = True
+    review.save()
+
+    review.delete()
+    
     return redirect('movies.show', id=id)
